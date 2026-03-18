@@ -1,0 +1,12 @@
+{
+  "name": "@openclaw/air-sdk-plugin",
+  "version": "2026.3.14",
+  "private": true,
+  "description": "OpenClaw AIR SDK plugin — AI-assisted scientific research tools",
+  "type": "module",
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

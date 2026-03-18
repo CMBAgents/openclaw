@@ -1,0 +1,8 @@
+{
+  "id": "air-sdk",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}
