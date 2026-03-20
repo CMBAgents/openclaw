@@ -1,13 +1,7 @@
-import { normalizeSecretInput } from "../../../src/utils/normalize-secret-input.js";
+// Config is resolved by the Python air SDK via AIR_API_KEY and AIR_BASE_URL
+// environment variables. This file is kept as a placeholder for future
+// TypeScript-side config needs (e.g. gating tool registration).
 
-export function resolveAirApiKey(): string | undefined {
-  return normalizeSecretInput(process.env.AIR_API_KEY);
-}
-
-export function resolveAirBaseUrl(): string {
-  const env = process.env.AIR_BASE_URL;
-  if (typeof env === "string" && env.trim()) {
-    return env.trim().replace(/\/+$/, "");
-  }
-  return "http://localhost:8000";
+export function isAirConfigured(): boolean {
+  return typeof process.env.AIR_API_KEY === "string" && process.env.AIR_API_KEY.length > 0;
 }
