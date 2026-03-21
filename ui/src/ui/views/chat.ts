@@ -559,10 +559,10 @@ function exportMarkdown(props: ChatProps): void {
 }
 
 const WELCOME_SUGGESTIONS = [
-  "What can you do?",
-  "Summarize my recent sessions",
-  "Help me configure a channel",
-  "Check system health",
+  "Check AIR backend health",
+  "List my research projects",
+  "What tools do I have?",
+  "Search memory for previous work",
 ];
 
 function renderWelcomeState(props: ChatProps): TemplateResult {
