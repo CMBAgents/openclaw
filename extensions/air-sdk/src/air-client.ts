@@ -45,6 +45,28 @@ function escPy(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n");
 }
 
+/** Return the scientist ID prefix (e.g. "scientist-1") or empty string if not set. */
+function scientistPrefix(): string {
+  return process.env.AIR_SCIENTIST_ID || "";
+}
+
+/** Prepend the scientist ID to a project name for server-side isolation. */
+function prefixProject(name: string): string {
+  const prefix = scientistPrefix();
+  if (!prefix) return name;
+  // Don't double-prefix
+  if (name.startsWith(`${prefix}--`)) return name;
+  return `${prefix}--${name}`;
+}
+
+/** Strip the scientist ID prefix from a project name for display. */
+function stripPrefix(name: string): string {
+  const prefix = scientistPrefix();
+  if (!prefix) return name;
+  const fullPrefix = `${prefix}--`;
+  return name.startsWith(fullPrefix) ? name.slice(fullPrefix.length) : name;
+}
+
 /** Build the standard `air.AIR(...)` constructor lines. */
 function clientPreamble(): string[] {
   return [
@@ -157,18 +179,23 @@ export async function airCreateProject(params: {
 }): Promise<Record<string, unknown>> {
   const script = [
     ...clientPreamble(),
-    `result = client.create_project('${escPy(params.name)}', data_description='${escPy(params.dataDescription)}')`,
-    "print(json.dumps({'project': result.name, 'status': 'created'}))",
+    `result = client.create_project('${escPy(prefixProject(params.name))}', data_description='${escPy(params.dataDescription)}')`,
+    `print(json.dumps({'project': '${escPy(params.name)}', 'status': 'created'}))`,
     "client.close()",
   ].join("\n");
   return await runPythonScript(script, 60_000);
 }
 
 export async function airListProjects(): Promise<Record<string, unknown>> {
+  const prefix = scientistPrefix();
   const script = [
     ...clientPreamble(),
     "result = client.list_projects()",
-    "print(json.dumps({'projects': result}))",
+    prefix
+      ? `filtered = [p for p in result if p.startswith('${escPy(prefix)}--')]`
+      : "filtered = result",
+    prefix ? `display = [p[${prefix.length + 2}:] for p in filtered]` : "display = filtered",
+    "print(json.dumps({'projects': display}))",
     "client.close()",
   ].join("\n");
   return await runPythonScript(script, 60_000);
@@ -177,7 +204,7 @@ export async function airListProjects(): Promise<Record<string, unknown>> {
 export async function airDeleteProject(params: { name: string }): Promise<Record<string, unknown>> {
   const script = [
     ...clientPreamble(),
-    `result = client.delete_project('${escPy(params.name)}')`,
+    `result = client.delete_project('${escPy(prefixProject(params.name))}')`,
     "print(json.dumps({'deleted': True}))",
     "client.close()",
   ].join("\n");
@@ -205,7 +232,7 @@ export async function airProjectIdea(params: {
   if (params.ideaIterations) opts.push(`idea_iterations=${params.ideaIterations},`);
   const script = [
     ...clientPreamble(),
-    `project = client.get_project('${escPy(params.project)}')`,
+    `project = client.get_project('${escPy(prefixProject(params.project))}')`,
     `result = project.idea(`,
     ...opts.map((o) => `    ${o}`),
     `)`,
@@ -227,7 +254,7 @@ export async function airProjectLiterature(params: {
   if (params.timeout) opts.push(`timeout=${params.timeout},`);
   const script = [
     ...clientPreamble(),
-    `project = client.get_project('${escPy(params.project)}')`,
+    `project = client.get_project('${escPy(prefixProject(params.project))}')`,
     `result = project.literature(`,
     ...opts.map((o) => `    ${o}`),
     `)`,
@@ -251,7 +278,7 @@ export async function airProjectMethods(params: {
   if (params.criticModel) opts.push(`critic_model='${escPy(params.criticModel)}',`);
   const script = [
     ...clientPreamble(),
-    `project = client.get_project('${escPy(params.project)}')`,
+    `project = client.get_project('${escPy(prefixProject(params.project))}')`,
     `result = project.methods(`,
     ...opts.map((o) => `    ${o}`),
     `)`,
@@ -276,7 +303,7 @@ export async function airProjectPaper(params: {
     opts.push(`add_citations=${params.addCitations ? "True" : "False"},`);
   const script = [
     ...clientPreamble(),
-    `project = client.get_project('${escPy(params.project)}')`,
+    `project = client.get_project('${escPy(prefixProject(params.project))}')`,
     `result = project.paper(`,
     ...opts.map((o) => `    ${o}`),
     `)`,
@@ -310,7 +337,7 @@ export async function airProjectReview(params: {
     opts.push(`review_numerics=${params.reviewNumerics ? "True" : "False"},`);
   const script = [
     ...clientPreamble(),
-    `project = client.get_project('${escPy(params.project)}')`,
+    `project = client.get_project('${escPy(prefixProject(params.project))}')`,
     `result = project.review(`,
     ...opts.map((o) => `    ${o}`),
     `)`,

@@ -1,6 +1,4 @@
-import type { AnyAgentTool } from "../../src/agents/tools/common.js";
-import { emptyPluginConfigSchema } from "../../src/plugins/config-schema.js";
-import type { OpenClawPluginApi } from "../../src/plugins/types.js";
+import { emptyPluginConfigSchema, type AnyAgentTool, type OpenClawPluginApi } from "./api.js";
 import {
   createArxivTool,
   createDeepResearchTool,

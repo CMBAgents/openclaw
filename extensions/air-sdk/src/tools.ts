@@ -1,7 +1,6 @@
 import { Type } from "@sinclair/typebox";
-import { optionalStringEnum } from "../../../src/agents/schema/typebox.js";
-import { jsonResult, readNumberParam, readStringParam } from "../../../src/agents/tools/common.js";
-import type { OpenClawPluginApi } from "../../../src/plugins/types.js";
+import { optionalStringEnum, jsonResult, readNumberParam, readStringParam } from "../api.js";
+import type { OpenClawPluginApi } from "../api.js";
 import {
   airArxiv,
   airCreateProject,
@@ -399,8 +398,7 @@ export function createMethodsTool(_api: OpenClawPluginApi) {
   return {
     name: "air_methods",
     label: "AIR Methods",
-    description:
-      "Develop research methods for an AIR project. Requires idea and literature to exist.",
+    description: "Develop research methods for an AIR project. Requires idea to exist.",
     parameters: MethodsSchema,
     execute: async (_toolCallId: string, rawParams: Record<string, unknown>) => {
       const project = readStringParam(rawParams, "project", { required: true });
