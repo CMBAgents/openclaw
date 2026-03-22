@@ -71,7 +71,8 @@ export function createArxivTool(_api: OpenClawPluginApi) {
   return {
     name: "air_arxiv",
     label: "AIR arXiv",
-    description: "Extract arXiv URLs from text, download the papers, and return summaries.",
+    description:
+      "Extract arXiv URLs from text and download the corresponding PDFs. Returns download statistics (URLs found, files downloaded, file paths).",
     parameters: ArxivSchema,
     execute: async (_toolCallId: string, rawParams: Record<string, unknown>) => {
       const text = readStringParam(rawParams, "text", { required: true });
@@ -289,8 +290,7 @@ const WriteFileSchema = Type.Object(
   {
     project: Type.String({ description: "Project name." }),
     path: Type.String({
-      description:
-        "Relative path within the project (e.g. 'Iteration0/input_files/idea.md').",
+      description: "Relative path within the project (e.g. 'Iteration0/input_files/idea.md').",
     }),
     content: Type.String({ description: "File content to write." }),
   },
@@ -321,8 +321,7 @@ const GetFileSchema = Type.Object(
   {
     project: Type.String({ description: "Project name." }),
     path: Type.String({
-      description:
-        "Relative path within the project (e.g. 'Iteration0/input_files/idea.md').",
+      description: "Relative path within the project (e.g. 'Iteration0/input_files/idea.md').",
     }),
   },
   { additionalProperties: false },
@@ -605,7 +604,10 @@ const ResultsSchema = Type.Object(
       Type.Number({ description: "Number of plan review rounds (default 1).", minimum: 0 }),
     ),
     restart_at_step: Type.Optional(
-      Type.Number({ description: "Step number to restart from (-1 = start from beginning).", minimum: -1 }),
+      Type.Number({
+        description: "Step number to restart from (-1 = start from beginning).",
+        minimum: -1,
+      }),
     ),
     engineer_model: Type.Optional(Type.String({ description: "LLM for the engineer agent." })),
     researcher_model: Type.Optional(Type.String({ description: "LLM for the researcher agent." })),
@@ -614,7 +616,9 @@ const ResultsSchema = Type.Object(
     default_model: Type.Optional(Type.String({ description: "Default LLM for all agents." })),
     formatter_model: Type.Optional(Type.String({ description: "LLM for response formatters." })),
     work_dir: Type.Optional(
-      Type.String({ description: "Local directory for code and outputs. Defaults to ~/ai-scientist." }),
+      Type.String({
+        description: "Local directory for code and outputs. Defaults to ~/ai-scientist.",
+      }),
     ),
     venv_path: Type.Optional(
       Type.String({ description: "Path to an existing Python virtual environment." }),
@@ -765,13 +769,20 @@ const DeepResearchSchema = Type.Object(
     planner_model: Type.Optional(Type.String({ description: "LLM for the planner agent." })),
     plan_reviewer_model: Type.Optional(Type.String({ description: "LLM for the plan reviewer." })),
     max_plan_steps: Type.Optional(
-      Type.Number({ description: "Maximum number of plan steps (default 3). Must match the number of steps in plan_instructions.", minimum: 1 }),
+      Type.Number({
+        description:
+          "Maximum number of plan steps (default 3). Must match the number of steps in plan_instructions.",
+        minimum: 1,
+      }),
     ),
     n_plan_reviews: Type.Optional(
       Type.Number({ description: "Number of plan review rounds (default 1).", minimum: 0 }),
     ),
     restart_at_step: Type.Optional(
-      Type.Number({ description: "Step number to restart from (-1 = start from beginning).", minimum: -1 }),
+      Type.Number({
+        description: "Step number to restart from (-1 = start from beginning).",
+        minimum: -1,
+      }),
     ),
     max_rounds: Type.Optional(
       Type.Number({
