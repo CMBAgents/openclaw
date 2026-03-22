@@ -701,7 +701,7 @@ const DeepResearchSchema = Type.Object(
     planner_model: Type.Optional(Type.String({ description: "LLM for the planner agent." })),
     plan_reviewer_model: Type.Optional(Type.String({ description: "LLM for the plan reviewer." })),
     max_plan_steps: Type.Optional(
-      Type.Number({ description: "Maximum number of plan steps (default 3).", minimum: 1 }),
+      Type.Number({ description: "Maximum number of plan steps (default 3). Must match the number of steps in plan_instructions.", minimum: 1 }),
     ),
     n_plan_reviews: Type.Optional(
       Type.Number({ description: "Number of plan review rounds (default 1).", minimum: 0 }),
@@ -720,7 +720,11 @@ const DeepResearchSchema = Type.Object(
     ),
     plan_instructions: Type.Optional(
       Type.String({
-        description: "Extra instructions for the planner (e.g. '1. engineer, 2. researcher.').",
+        description:
+          "Instructions for the planner on how to structure the plan. " +
+          "Specify the sequence of steps and which agent handles each. " +
+          "Available agents: 'engineer' (writes and runs code) and 'researcher' (analyzes results, writes reports). " +
+          "Example: '1. engineer: load the data and compute statistics, 2. engineer: generate plots, 3. researcher: interpret results and write summary.'",
       }),
     ),
     engineer_instructions: Type.Optional(
