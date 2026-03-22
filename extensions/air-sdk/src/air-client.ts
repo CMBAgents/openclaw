@@ -459,6 +459,7 @@ export async function airDeepResearch(params: {
   planReviewerModel?: string;
   maxPlanSteps?: number;
   nPlanReviews?: number;
+  restartAtStep?: number;
   maxRoundsPlanning?: number;
   maxRounds?: number;
   maxAttempts?: number;
@@ -478,6 +479,8 @@ export async function airDeepResearch(params: {
 }): Promise<Record<string, unknown>> {
   const timeoutSec = params.timeout ?? 3600;
   const opts: string[] = [];
+  if (params.restartAtStep !== undefined && params.restartAtStep >= 0)
+    opts.push(`restart_at_step=${params.restartAtStep},`);
   if (params.engineerModel) opts.push(`engineer_model='${escPy(params.engineerModel)}',`);
   if (params.researcherModel) opts.push(`researcher_model='${escPy(params.researcherModel)}',`);
   if (params.plannerModel) opts.push(`planner_model='${escPy(params.plannerModel)}',`);

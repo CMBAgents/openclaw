@@ -706,6 +706,9 @@ const DeepResearchSchema = Type.Object(
     n_plan_reviews: Type.Optional(
       Type.Number({ description: "Number of plan review rounds (default 1).", minimum: 0 }),
     ),
+    restart_at_step: Type.Optional(
+      Type.Number({ description: "Step number to restart from (-1 = start from beginning).", minimum: -1 }),
+    ),
     max_rounds: Type.Optional(
       Type.Number({
         description: "Max conversation rounds per control step (default 100).",
@@ -767,6 +770,7 @@ export function createDeepResearchTool(_api: OpenClawPluginApi) {
       const planReviewerModel = readStringParam(rawParams, "plan_reviewer_model");
       const maxPlanSteps = readNumberParam(rawParams, "max_plan_steps", { integer: true });
       const nPlanReviews = readNumberParam(rawParams, "n_plan_reviews", { integer: true });
+      const restartAtStep = readNumberParam(rawParams, "restart_at_step", { integer: true });
       const maxRounds = readNumberParam(rawParams, "max_rounds", { integer: true });
       const maxAttempts = readNumberParam(rawParams, "max_attempts", { integer: true });
       const planInstructions = readStringParam(rawParams, "plan_instructions");
@@ -787,6 +791,7 @@ export function createDeepResearchTool(_api: OpenClawPluginApi) {
           planReviewerModel: planReviewerModel ?? undefined,
           maxPlanSteps: maxPlanSteps ?? undefined,
           nPlanReviews: nPlanReviews ?? undefined,
+          restartAtStep: restartAtStep ?? undefined,
           maxRounds: maxRounds ?? undefined,
           maxAttempts: maxAttempts ?? undefined,
           planInstructions: planInstructions ?? undefined,
