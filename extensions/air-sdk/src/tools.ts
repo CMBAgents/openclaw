@@ -16,6 +16,7 @@ import {
   airProjectLiterature,
   airProjectMethods,
   airProjectPaper,
+  airProjectResults,
   airProjectReview,
   airReview,
 } from "./air-client.js";
@@ -517,6 +518,83 @@ export function createProjectReviewTool(_api: OpenClawPluginApi) {
           verifyStatements: verifyStatements ?? undefined,
           reviewMaths: reviewMaths ?? undefined,
           reviewNumerics: reviewNumerics ?? undefined,
+        }),
+      );
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// air_results — run analysis/results for a project (local code execution)
+// ---------------------------------------------------------------------------
+
+const ResultsSchema = Type.Object(
+  {
+    project: Type.String({ description: "Project name (must have idea and methods generated)." }),
+    max_steps: Type.Optional(
+      Type.Number({ description: "Maximum number of plan steps (default 3).", minimum: 1 }),
+    ),
+    max_attempts: Type.Optional(
+      Type.Number({ description: "Retry attempts per step on failure (default 5).", minimum: 1 }),
+    ),
+    n_plan_reviews: Type.Optional(
+      Type.Number({ description: "Number of plan review rounds (default 1).", minimum: 0 }),
+    ),
+    engineer_model: Type.Optional(Type.String({ description: "LLM for the engineer agent." })),
+    researcher_model: Type.Optional(Type.String({ description: "LLM for the researcher agent." })),
+    planner_model: Type.Optional(Type.String({ description: "LLM for the planner agent." })),
+    plan_reviewer_model: Type.Optional(Type.String({ description: "LLM for the plan reviewer." })),
+    default_model: Type.Optional(Type.String({ description: "Default LLM for all agents." })),
+    formatter_model: Type.Optional(Type.String({ description: "LLM for response formatters." })),
+    work_dir: Type.Optional(
+      Type.String({ description: "Local directory for code and outputs. Defaults to ~/ai-scientist." }),
+    ),
+    venv_path: Type.Optional(
+      Type.String({ description: "Path to an existing Python virtual environment." }),
+    ),
+    timeout: Type.Optional(
+      Type.Number({ description: "Max seconds for the session (default 3600).", minimum: 60 }),
+    ),
+  },
+  { additionalProperties: false },
+);
+
+export function createResultsTool(_api: OpenClawPluginApi) {
+  return {
+    name: "air_results",
+    label: "AIR Results",
+    description:
+      "Run analysis and produce results for an AIR project. Code executes locally. Requires idea and methods to exist. Produces results that can be used by air_paper.",
+    parameters: ResultsSchema,
+    execute: async (_toolCallId: string, rawParams: Record<string, unknown>) => {
+      const project = readStringParam(rawParams, "project", { required: true });
+      const maxSteps = readNumberParam(rawParams, "max_steps", { integer: true });
+      const maxAttempts = readNumberParam(rawParams, "max_attempts", { integer: true });
+      const nPlanReviews = readNumberParam(rawParams, "n_plan_reviews", { integer: true });
+      const engineerModel = readStringParam(rawParams, "engineer_model");
+      const researcherModel = readStringParam(rawParams, "researcher_model");
+      const plannerModel = readStringParam(rawParams, "planner_model");
+      const planReviewerModel = readStringParam(rawParams, "plan_reviewer_model");
+      const defaultModel = readStringParam(rawParams, "default_model");
+      const formatterModel = readStringParam(rawParams, "formatter_model");
+      const workDir = readStringParam(rawParams, "work_dir");
+      const venvPath = readStringParam(rawParams, "venv_path");
+      const timeout = readNumberParam(rawParams, "timeout", { integer: true });
+      return jsonResult(
+        await airProjectResults({
+          project,
+          maxSteps: maxSteps ?? undefined,
+          maxAttempts: maxAttempts ?? undefined,
+          nPlanReviews: nPlanReviews ?? undefined,
+          engineerModel: engineerModel ?? undefined,
+          researcherModel: researcherModel ?? undefined,
+          plannerModel: plannerModel ?? undefined,
+          planReviewerModel: planReviewerModel ?? undefined,
+          defaultModel: defaultModel ?? undefined,
+          formatterModel: formatterModel ?? undefined,
+          workDir: workDir ?? undefined,
+          venvPath: venvPath ?? undefined,
+          timeout: timeout ?? undefined,
         }),
       );
     },

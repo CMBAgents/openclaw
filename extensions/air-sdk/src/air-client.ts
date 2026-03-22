@@ -348,6 +348,55 @@ export async function airProjectReview(params: {
 }
 
 // ---------------------------------------------------------------------------
+// results — WebSocket-based local code execution for project analysis
+// ---------------------------------------------------------------------------
+
+export async function airProjectResults(params: {
+  project: string;
+  maxSteps?: number;
+  maxAttempts?: number;
+  nPlanReviews?: number;
+  engineerModel?: string;
+  researcherModel?: string;
+  plannerModel?: string;
+  planReviewerModel?: string;
+  defaultModel?: string;
+  formatterModel?: string;
+  workDir?: string;
+  venvPath?: string;
+  timeout?: number;
+}): Promise<Record<string, unknown>> {
+  const timeoutSec = params.timeout ?? 3600;
+  const opts: string[] = [];
+  if (params.engineerModel) opts.push(`engineer_model='${escPy(params.engineerModel)}',`);
+  if (params.researcherModel) opts.push(`researcher_model='${escPy(params.researcherModel)}',`);
+  if (params.plannerModel) opts.push(`planner_model='${escPy(params.plannerModel)}',`);
+  if (params.planReviewerModel) opts.push(`plan_reviewer_model='${escPy(params.planReviewerModel)}',`);
+  if (params.defaultModel) opts.push(`default_model='${escPy(params.defaultModel)}',`);
+  if (params.formatterModel) opts.push(`formatter_model='${escPy(params.formatterModel)}',`);
+  if (params.workDir) opts.push(`work_dir='${escPy(params.workDir)}',`);
+  const venv = process.env.AIR_VENV_PATH ?? params.venvPath;
+  if (venv) opts.push(`venv_path='${escPy(venv)}',`);
+  const script = [
+    ...clientPreamble(),
+    `project = client.get_project('${escPy(prefixProject(params.project))}')`,
+    "result = project.results(",
+    ...opts.map((o) => `    ${o}`),
+    `    max_steps=${params.maxSteps ?? 3},`,
+    `    max_attempts=${params.maxAttempts ?? 5},`,
+    `    n_plan_reviews=${params.nPlanReviews ?? 1},`,
+    `    timeout=${timeoutSec},`,
+    ")",
+    "print(json.dumps({",
+    "    'status': 'completed',",
+    "    'output': (result or '')[:5000],",
+    "}))",
+    "client.close()",
+  ].join("\n");
+  return await runPythonScript(script, timeoutSec * 1000 + 30_000);
+}
+
+// ---------------------------------------------------------------------------
 // one_shot & deep_research — WebSocket-based local code execution
 // ---------------------------------------------------------------------------
 

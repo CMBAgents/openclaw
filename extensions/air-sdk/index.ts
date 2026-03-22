@@ -15,6 +15,7 @@ import {
   createPaperTool,
   createProjectReviewTool,
   createProjectTool,
+  createResultsTool,
   createReviewTool,
 } from "./src/tools.js";
 
@@ -40,6 +41,7 @@ const airSdkPlugin = {
     api.registerTool(createIdeaTool(api) as AnyAgentTool);
     api.registerTool(createLiteratureTool(api) as AnyAgentTool);
     api.registerTool(createMethodsTool(api) as AnyAgentTool);
+    api.registerTool(createResultsTool(api) as AnyAgentTool);
     api.registerTool(createPaperTool(api) as AnyAgentTool);
     api.registerTool(createProjectReviewTool(api) as AnyAgentTool);
     // One-shot & deep research (local code execution via Python)
