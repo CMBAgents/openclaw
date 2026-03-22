@@ -19,6 +19,8 @@ import {
   airProjectResults,
   airProjectReview,
   airReview,
+  airWriteFile,
+  airGetFile,
 } from "./air-client.js";
 
 // ---------------------------------------------------------------------------
@@ -275,6 +277,68 @@ export function createDeleteProjectTool(_api: OpenClawPluginApi) {
     execute: async (_toolCallId: string, rawParams: Record<string, unknown>) => {
       const name = readStringParam(rawParams, "name", { required: true });
       return jsonResult(await airDeleteProject({ name }));
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// air_write_file — write/update a file in a project on the server
+// ---------------------------------------------------------------------------
+
+const WriteFileSchema = Type.Object(
+  {
+    project: Type.String({ description: "Project name." }),
+    path: Type.String({
+      description:
+        "Relative path within the project (e.g. 'Iteration0/input_files/idea.md').",
+    }),
+    content: Type.String({ description: "File content to write." }),
+  },
+  { additionalProperties: false },
+);
+
+export function createWriteFileTool(_api: OpenClawPluginApi) {
+  return {
+    name: "air_write_file",
+    label: "AIR Write File",
+    description:
+      "Write or update a file in an AIR project on the server. Use this to push local edits back to the server (e.g. a revised idea.md).",
+    parameters: WriteFileSchema,
+    execute: async (_toolCallId: string, rawParams: Record<string, unknown>) => {
+      const project = readStringParam(rawParams, "project", { required: true });
+      const path = readStringParam(rawParams, "path", { required: true });
+      const content = readStringParam(rawParams, "content", { required: true });
+      return jsonResult(await airWriteFile({ project, path, content }));
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// air_get_file — read a file from a project on the server
+// ---------------------------------------------------------------------------
+
+const GetFileSchema = Type.Object(
+  {
+    project: Type.String({ description: "Project name." }),
+    path: Type.String({
+      description:
+        "Relative path within the project (e.g. 'Iteration0/input_files/idea.md').",
+    }),
+  },
+  { additionalProperties: false },
+);
+
+export function createGetFileTool(_api: OpenClawPluginApi) {
+  return {
+    name: "air_get_file",
+    label: "AIR Get File",
+    description:
+      "Read a file from an AIR project on the server. Use this to fetch the latest version of project files (idea.md, methods.md, etc.).",
+    parameters: GetFileSchema,
+    execute: async (_toolCallId: string, rawParams: Record<string, unknown>) => {
+      const project = readStringParam(rawParams, "project", { required: true });
+      const path = readStringParam(rawParams, "path", { required: true });
+      return jsonResult(await airGetFile({ project, path }));
     },
   };
 }

@@ -17,6 +17,8 @@ import {
   createProjectTool,
   createResultsTool,
   createReviewTool,
+  createWriteFileTool,
+  createGetFileTool,
 } from "./src/tools.js";
 
 const airSdkPlugin = {
@@ -37,6 +39,9 @@ const airSdkPlugin = {
     api.registerTool(createProjectTool(api) as AnyAgentTool);
     api.registerTool(createListProjectsTool(api) as AnyAgentTool);
     api.registerTool(createDeleteProjectTool(api) as AnyAgentTool);
+    // File operations
+    api.registerTool(createWriteFileTool(api) as AnyAgentTool);
+    api.registerTool(createGetFileTool(api) as AnyAgentTool);
     // Pipeline steps
     api.registerTool(createIdeaTool(api) as AnyAgentTool);
     api.registerTool(createLiteratureTool(api) as AnyAgentTool);

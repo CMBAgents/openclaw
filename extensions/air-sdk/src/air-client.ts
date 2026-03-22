@@ -13,7 +13,7 @@ function resolveAirPython(): string {
   return "python3";
 }
 
-function runPythonScript(script: string, timeoutMs: number): Promise<Record<string, unknown>> {
+function runPythonScript(script: string, timeoutMs: number, extraEnv?: Record<string, string>): Promise<Record<string, unknown>> {
   return new Promise((resolve, reject) => {
     const pythonPath = resolveAirPython();
     execFile(
@@ -22,7 +22,7 @@ function runPythonScript(script: string, timeoutMs: number): Promise<Record<stri
       {
         timeout: timeoutMs,
         maxBuffer: 10 * 1024 * 1024,
-        env: { ...process.env },
+        env: { ...process.env, ...extraEnv },
       },
       (error, stdout, stderr) => {
         if (error) {
@@ -206,6 +206,38 @@ export async function airDeleteProject(params: { name: string }): Promise<Record
     ...clientPreamble(),
     `result = client.delete_project('${escPy(prefixProject(params.name))}')`,
     "print(json.dumps({'deleted': True}))",
+    "client.close()",
+  ].join("\n");
+  return await runPythonScript(script, 60_000);
+}
+
+export async function airWriteFile(params: {
+  project: string;
+  path: string;
+  content: string;
+}): Promise<Record<string, unknown>> {
+  // Pass content via env var to avoid escaping issues with quotes/newlines
+  const envContent = params.content;
+  const script = [
+    ...clientPreamble(),
+    `project = client.get_project('${escPy(prefixProject(params.project))}')`,
+    `content = os.environ['_AIR_WRITE_CONTENT']`,
+    `result = project.write_file('${escPy(params.path)}', content)`,
+    "print(json.dumps(result))",
+    "client.close()",
+  ].join("\n");
+  return await runPythonScript(script, 60_000, { _AIR_WRITE_CONTENT: envContent });
+}
+
+export async function airGetFile(params: {
+  project: string;
+  path: string;
+}): Promise<Record<string, unknown>> {
+  const script = [
+    ...clientPreamble(),
+    `project = client.get_project('${escPy(prefixProject(params.project))}')`,
+    `content = project.get_file('${escPy(params.path)}')`,
+    "print(json.dumps({'content': content}))",
     "client.close()",
   ].join("\n");
   return await runPythonScript(script, 60_000);
