@@ -540,6 +540,9 @@ const ResultsSchema = Type.Object(
     n_plan_reviews: Type.Optional(
       Type.Number({ description: "Number of plan review rounds (default 1).", minimum: 0 }),
     ),
+    restart_at_step: Type.Optional(
+      Type.Number({ description: "Step number to restart from (-1 = start from beginning).", minimum: -1 }),
+    ),
     engineer_model: Type.Optional(Type.String({ description: "LLM for the engineer agent." })),
     researcher_model: Type.Optional(Type.String({ description: "LLM for the researcher agent." })),
     planner_model: Type.Optional(Type.String({ description: "LLM for the planner agent." })),
@@ -571,6 +574,7 @@ export function createResultsTool(_api: OpenClawPluginApi) {
       const maxSteps = readNumberParam(rawParams, "max_steps", { integer: true });
       const maxAttempts = readNumberParam(rawParams, "max_attempts", { integer: true });
       const nPlanReviews = readNumberParam(rawParams, "n_plan_reviews", { integer: true });
+      const restartAtStep = readNumberParam(rawParams, "restart_at_step", { integer: true });
       const engineerModel = readStringParam(rawParams, "engineer_model");
       const researcherModel = readStringParam(rawParams, "researcher_model");
       const plannerModel = readStringParam(rawParams, "planner_model");
@@ -586,6 +590,7 @@ export function createResultsTool(_api: OpenClawPluginApi) {
           maxSteps: maxSteps ?? undefined,
           maxAttempts: maxAttempts ?? undefined,
           nPlanReviews: nPlanReviews ?? undefined,
+          restartAtStep: restartAtStep ?? undefined,
           engineerModel: engineerModel ?? undefined,
           researcherModel: researcherModel ?? undefined,
           plannerModel: plannerModel ?? undefined,
