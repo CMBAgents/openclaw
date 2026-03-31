@@ -13,7 +13,11 @@ function resolveAirPython(): string {
   return "python3";
 }
 
-function runPythonScript(script: string, timeoutMs: number, extraEnv?: Record<string, string>): Promise<Record<string, unknown>> {
+function runPythonScript(
+  script: string,
+  timeoutMs: number,
+  extraEnv?: Record<string, string>,
+): Promise<Record<string, unknown>> {
   return new Promise((resolve, reject) => {
     const pythonPath = resolveAirPython();
     execFile(
@@ -394,7 +398,7 @@ export async function airProjectResults(params: {
   plannerModel?: string;
   planReviewerModel?: string;
   defaultModel?: string;
-  formatterModel?: string;
+  evaluatorModel?: string;
   workDir?: string;
   venvPath?: string;
   timeout?: number;
@@ -406,9 +410,10 @@ export async function airProjectResults(params: {
   if (params.engineerModel) opts.push(`engineer_model='${escPy(params.engineerModel)}',`);
   if (params.researcherModel) opts.push(`researcher_model='${escPy(params.researcherModel)}',`);
   if (params.plannerModel) opts.push(`planner_model='${escPy(params.plannerModel)}',`);
-  if (params.planReviewerModel) opts.push(`plan_reviewer_model='${escPy(params.planReviewerModel)}',`);
+  if (params.planReviewerModel)
+    opts.push(`plan_reviewer_model='${escPy(params.planReviewerModel)}',`);
   if (params.defaultModel) opts.push(`default_model='${escPy(params.defaultModel)}',`);
-  if (params.formatterModel) opts.push(`formatter_model='${escPy(params.formatterModel)}',`);
+  if (params.evaluatorModel) opts.push(`evaluator_model='${escPy(params.evaluatorModel)}',`);
   if (params.workDir) opts.push(`work_dir='${escPy(params.workDir)}',`);
   const venv = process.env.AIR_VENV_PATH ?? params.venvPath;
   if (venv) opts.push(`venv_path='${escPy(venv)}',`);

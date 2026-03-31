@@ -614,7 +614,7 @@ const ResultsSchema = Type.Object(
     planner_model: Type.Optional(Type.String({ description: "LLM for the planner agent." })),
     plan_reviewer_model: Type.Optional(Type.String({ description: "LLM for the plan reviewer." })),
     default_model: Type.Optional(Type.String({ description: "Default LLM for all agents." })),
-    formatter_model: Type.Optional(Type.String({ description: "LLM for response formatters." })),
+    evaluator_model: Type.Optional(Type.String({ description: "LLM for response evaluators." })),
     work_dir: Type.Optional(
       Type.String({
         description: "Local directory for code and outputs. Defaults to ~/ai-scientist.",
@@ -648,7 +648,7 @@ export function createResultsTool(_api: OpenClawPluginApi) {
       const plannerModel = readStringParam(rawParams, "planner_model");
       const planReviewerModel = readStringParam(rawParams, "plan_reviewer_model");
       const defaultModel = readStringParam(rawParams, "default_model");
-      const formatterModel = readStringParam(rawParams, "formatter_model");
+      const evaluatorModel = readStringParam(rawParams, "evaluator_model");
       const workDir = readStringParam(rawParams, "work_dir");
       const venvPath = readStringParam(rawParams, "venv_path");
       const timeout = readNumberParam(rawParams, "timeout", { integer: true });
@@ -664,7 +664,7 @@ export function createResultsTool(_api: OpenClawPluginApi) {
           plannerModel: plannerModel ?? undefined,
           planReviewerModel: planReviewerModel ?? undefined,
           defaultModel: defaultModel ?? undefined,
-          formatterModel: formatterModel ?? undefined,
+          evaluatorModel: evaluatorModel ?? undefined,
           workDir: workDir ?? undefined,
           venvPath: venvPath ?? undefined,
           timeout: timeout ?? undefined,
