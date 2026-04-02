@@ -270,10 +270,16 @@ export function createSessionMcpRuntime(params: {
       if (!session) {
         throw new Error(`bundle-mcp server "${serverName}" is not connected`);
       }
-      return (await session.client.callTool({
-        name: toolName,
-        arguments: isMcpConfigRecord(input) ? input : {},
-      })) as CallToolResult;
+      return (await session.client.callTool(
+        {
+          name: toolName,
+          arguments: isMcpConfigRecord(input) ? input : {},
+        },
+        undefined,
+        {
+          timeout: 30 * 60 * 1000, // 30 minutes for long-running tools
+        },
+      )) as CallToolResult;
     },
     async dispose() {
       if (disposed) {
