@@ -32,6 +32,7 @@ type LoadedMcpConfig = ReturnType<typeof loadEmbeddedPiMcpConfig>;
 type ListedTool = Awaited<ReturnType<Client["listTools"]>>["tools"][number];
 
 const SESSION_MCP_RUNTIME_MANAGER_KEY = Symbol.for("openclaw.sessionMcpRuntimeManager");
+const DEFAULT_TOOL_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
 function connectWithTimeout(
   client: Client,
@@ -270,6 +271,11 @@ export function createSessionMcpRuntime(params: {
       if (!session) {
         throw new Error(`bundle-mcp server "${serverName}" is not connected`);
       }
+      const serverConfig = loaded.mcpServers[serverName];
+      const configuredTimeout =
+        serverConfig && typeof serverConfig.toolTimeoutMs === "number" && serverConfig.toolTimeoutMs > 0
+          ? serverConfig.toolTimeoutMs
+          : DEFAULT_TOOL_TIMEOUT_MS;
       return (await session.client.callTool(
         {
           name: toolName,
@@ -277,7 +283,7 @@ export function createSessionMcpRuntime(params: {
         },
         undefined,
         {
-          timeout: 30 * 60 * 1000, // 30 minutes for long-running tools
+          timeout: configuredTimeout,
         },
       )) as CallToolResult;
     },
