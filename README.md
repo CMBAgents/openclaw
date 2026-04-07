@@ -91,6 +91,27 @@ New install? Start here: [Getting started](https://docs.openclaw.ai/start/gettin
 
 Model note: while many providers and models are supported, prefer a current flagship model from the provider you trust and already use. See [Onboarding](https://docs.openclaw.ai/start/onboarding).
 
+## CMBAgents fork changes
+
+This fork ([CMBAgents/openclaw](https://github.com/CMBAgents/openclaw)) adds:
+
+- **Configurable MCP tool call timeout**: MCP tool calls default to a 30-minute timeout (upstream has no explicit timeout). Override per server in `openclaw.json`:
+
+  ```json
+  {
+    "mcp": {
+      "servers": {
+        "denario": {
+          "command": "denario-idea-mcp",
+          "toolTimeoutMs": 3600000
+        }
+      }
+    }
+  }
+  ```
+
+  Set `toolTimeoutMs` (in milliseconds) on any MCP server entry. If omitted, defaults to 30 minutes.
+
 ## Models (selection + auth)
 
 - Models config + CLI: [Models](https://docs.openclaw.ai/concepts/models)
