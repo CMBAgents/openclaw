@@ -78,6 +78,12 @@ const HOST_READ_ALLOWED_DOCUMENT_MIMES = new Set([
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "text/csv",
+  "text/html",
+  "text/markdown",
+  "text/plain",
+  "text/x-latex",
+  "text/x-tex",
 ]);
 const MB = 1024 * 1024;
 
