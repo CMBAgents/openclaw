@@ -390,7 +390,7 @@ async function loadWebMediaInternal(
   }
   if (hostReadCapability) {
     assertHostReadMediaAllowed({
-      contentType: verifiedMime,
+      contentType: verifiedMime ?? detectedMime,
       kind: kindFromMime(detectedMime ?? verifiedMime),
     });
   }
