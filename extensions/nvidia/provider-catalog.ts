@@ -46,7 +46,7 @@ export function buildNvidiaProvider(): ModelProviderConfig {
       {
         id: "nvidia/nemotron-3-super-120b-a12b",
         name: "NVIDIA Nemotron 3 Super 120B A12B",
-        reasoning: false,
+        reasoning: true,
         input: ["text"],
         cost: NVIDIA_DEFAULT_COST,
         contextWindow: NVIDIA_DEFAULT_CONTEXT_WINDOW,
