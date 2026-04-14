@@ -10,6 +10,7 @@ import {
   VLLM_MODEL_PLACEHOLDER,
   VLLM_PROVIDER_LABEL,
 } from "./api.js";
+import { wrapVllmProviderStream } from "./stream.js";
 
 const PROVIDER_ID = "vllm";
 
@@ -89,6 +90,10 @@ export default definePluginEntry({
         "vLLM requires authentication to be registered as a provider. " +
         'Set VLLM_API_KEY (any value works) or run "openclaw configure". ' +
         "See: https://docs.openclaw.ai/providers/vllm",
+      // Translate openclaw's OpenAI-style thinking signals into the
+      // vLLM `extra_body.chat_template_kwargs.enable_thinking` wire format
+      // used by Gemma 4 (and other template-kwargs-driven vLLM models).
+      wrapStreamFn: wrapVllmProviderStream,
     });
   },
 });
